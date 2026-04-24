@@ -1,3 +1,7 @@
 <Solution>
   <Project Path="AnalysisTagger/AnalysisTagger.csproj" />
+  <Project Path="AnalysisTagger.Domain/AnalysisTagger.Domain.csproj" />
+  <Project Path="AnalysisTagger.Application/AnalysisTagger.Application.csproj" />
+  <Project Path="AnalysisTagger.Infrastructure/AnalysisTagger.Infrastructure.csproj" />
+  <Project Path="AnalysisTagger.Tests/AnalysisTagger.Tests.csproj" />
 </Solution>

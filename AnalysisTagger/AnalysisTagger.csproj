@@ -71,9 +71,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Application\" />
-	  <Folder Include="Infrastructure\" />
-	  <Folder Include="UI\" />
+	  <ProjectReference Include="..\AnalysisTagger.Domain\AnalysisTagger.Domain.csproj" />
+	  <ProjectReference Include="..\AnalysisTagger.Application\AnalysisTagger.Application.csproj" />
 	</ItemGroup>
 
 </Project>
