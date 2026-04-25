@@ -163,4 +163,90 @@ public class TaggingServiceTests
 
         await act.Should().ThrowAsync<InvalidTagException>();
     }
+
+    // ── GetProjectSummaryAsync ──────────────────────────────────────
+
+    [Fact]
+    public async Task GetProjectSummaryAsync_ReturnsCategoriesOrderedBySortOrder()
+    {
+        var uow = new InMemoryUnitOfWork();
+        var svc = new TaggingService(uow);
+
+        var project = new Project
+        {
+            Template = new TagTemplate
+            {
+                Categories = new List<Category>
+                {
+                    new() { Id = Guid.NewGuid(), Name = "B", SortOrder = 2 },
+                    new() { Id = Guid.NewGuid(), Name = "A", SortOrder = 1 },
+                    new() { Id = Guid.NewGuid(), Name = "C", SortOrder = 3 },
+                }
+            },
+            HomeTeam = new Team(),
+            AwayTeam = new Team()
+        };
+        await uow.Projects.AddAsync(project);
+
+        var (categories, _) = await svc.GetProjectSummaryAsync(project.Id);
+
+        categories.Select(c => c.Name).Should().ContainInOrder("A", "B", "C");
+    }
+
+    [Fact]
+    public async Task GetProjectSummaryAsync_ReturnsTagsOrderedByStartTime()
+    {
+        var (svc, uow, project) = Create();
+        var categoryId = project.Template.Categories[0].Id;
+
+        await svc.TagEventAsync(project.Id, new CreateEventTagDto { CategoryId = categoryId, Position = Timecode.FromSeconds(60) });
+        await svc.TagEventAsync(project.Id, new CreateEventTagDto { CategoryId = categoryId, Position = Timecode.FromSeconds(10) });
+        await svc.TagEventAsync(project.Id, new CreateEventTagDto { CategoryId = categoryId, Position = Timecode.FromSeconds(30) });
+
+        var (_, tags) = await svc.GetProjectSummaryAsync(project.Id);
+
+        tags.Select(t => t.StartTime.Value.TotalSeconds)
+            .Should().BeInAscendingOrder();
+    }
+
+    [Fact]
+    public async Task GetProjectSummaryAsync_ReturnsCategoryDtoFields()
+    {
+        var uow = new InMemoryUnitOfWork();
+        var svc = new TaggingService(uow);
+        var catId = Guid.NewGuid();
+
+        var project = new Project
+        {
+            Template = new TagTemplate
+            {
+                Categories = new List<Category>
+                {
+                    new() { Id = catId, Name = "Shot", Color = "#FF0000", SortOrder = 1 }
+                }
+            },
+            HomeTeam = new Team(),
+            AwayTeam = new Team()
+        };
+        await uow.Projects.AddAsync(project);
+
+        var (categories, _) = await svc.GetProjectSummaryAsync(project.Id);
+        var dto = categories.Single();
+
+        dto.Id.Should().Be(catId);
+        dto.Name.Should().Be("Shot");
+        dto.Color.Should().Be("#FF0000");
+        dto.SortOrder.Should().Be(1);
+    }
+
+    [Fact]
+    public async Task GetProjectSummaryAsync_Throws_WhenProjectNotFound()
+    {
+        var uow = new InMemoryUnitOfWork();
+        var svc = new TaggingService(uow);
+
+        var act = async () => await svc.GetProjectSummaryAsync(Guid.NewGuid());
+
+        await act.Should().ThrowAsync<ProjectNotFoundException>();
+    }
 }

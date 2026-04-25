@@ -30,4 +30,7 @@ public class InMemoryProjectRepository : IProjectRepository
         _store.Remove(id);
         return Task.CompletedTask;
     }
+
+    // No-op: entity is already in project.Events via domain AddEvent; no EF context to inform.
+    public void TrackNewEventTag(EventTag tag) { }
 }
