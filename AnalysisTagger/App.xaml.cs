@@ -1,17 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+namespace AnalysisTagger;
 
-namespace AnalysisTagger
+public partial class App
 {
-    public partial class App : Application
+    public App(AppShell appShell)
     {
-        public App()
-        {
-            InitializeComponent();
-        }
-
-        protected override Window CreateWindow(IActivationState? activationState)
-        {
-            return new Window(new AppShell());
-        }
+        InitializeComponent();
+        MainPage = appShell;
     }
 }

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AnalysisTagger.UI.Pages.ProjectsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:dto="clr-namespace:AnalysisTagger.Application.DTOs;assembly=AnalysisTagger.Application"
+    Title="Projects">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem
+            Command="{Binding CreateProjectCommand}"
+            Order="Primary"
+            Text="New Project" />
+    </ContentPage.ToolbarItems>
+
+    <Grid RowDefinitions="Auto,*">
+
+        <ActivityIndicator
+            Grid.Row="0"
+            HorizontalOptions="Center"
+            IsRunning="{Binding IsLoading}"
+            IsVisible="{Binding IsLoading}" />
+
+        <CollectionView
+            Grid.Row="1"
+            x:Name="ProjectsCollection"
+            ItemsSource="{Binding Projects}"
+            SelectionMode="Single"
+            SelectionChanged="OnProjectSelectionChanged">
+
+            <CollectionView.EmptyView>
+                <VerticalStackLayout
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    Spacing="12"
+                    Margin="32">
+                    <Label
+                        Text="No projects yet"
+                        HorizontalOptions="Center"
+                        FontSize="18" />
+                    <Label
+                        Text="Tap 'New Project' to get started"
+                        HorizontalOptions="Center"
+                        FontSize="14"
+                        TextColor="Gray" />
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="dto:ProjectDto">
+                    <Border Margin="12,6" Padding="16" StrokeShape="RoundRectangle 8">
+                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                            <Label
+                                Grid.Row="0" Grid.Column="0"
+                                Text="{Binding Title}"
+                                FontSize="16"
+                                FontAttributes="Bold" />
+                            <Label
+                                Grid.Row="0" Grid.Column="1"
+                                Text="{Binding EventCount, StringFormat='{0} tags'}"
+                                FontSize="13"
+                                TextColor="Gray"
+                                VerticalOptions="Center" />
+                            <Label
+                                Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                                FontSize="13"
+                                TextColor="Gray">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="{Binding Competition}" />
+                                        <Span Text=" · " />
+                                        <Span Text="{Binding Season}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+    </Grid>
+
+</ContentPage>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AnalysisTagger.UI.Pages.AnalysisPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="{Binding ProjectTitle}">
+
+    <VerticalStackLayout
+        HorizontalOptions="Center"
+        VerticalOptions="Center"
+        Spacing="16">
+        <Label
+            Text="Analysis"
+            FontSize="24"
+            FontAttributes="Bold"
+            HorizontalOptions="Center" />
+        <Label
+            Text="{Binding ProjectId, StringFormat='Project: {0}'}"
+            FontSize="14"
+            TextColor="Gray"
+            HorizontalOptions="Center" />
+        <Label
+            Text="Video player and tagging panel coming in the next phase."
+            FontSize="13"
+            TextColor="Gray"
+            HorizontalOptions="Center" />
+    </VerticalStackLayout>
+
+</ContentPage>

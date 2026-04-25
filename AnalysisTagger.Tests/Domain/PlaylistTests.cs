@@ -1,3 +1,4 @@
+
 using AnalysisTagger.Domain.Models;
 using AnalysisTagger.Domain.ValueObjects;
 using FluentAssertions;

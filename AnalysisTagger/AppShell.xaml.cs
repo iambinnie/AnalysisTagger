@@ -1,10 +1,12 @@
-﻿namespace AnalysisTagger
+using AnalysisTagger.UI.Pages;
+
+namespace AnalysisTagger;
+
+public partial class AppShell : Shell
 {
-    public partial class AppShell : Shell
+    public AppShell()
     {
-        public AppShell()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+        Routing.RegisterRoute(nameof(AnalysisPage), typeof(AnalysisPage));
     }
 }
