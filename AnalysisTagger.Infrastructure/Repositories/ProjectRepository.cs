@@ -26,7 +26,11 @@ public class ProjectRepository : IProjectRepository
 
     public Task UpdateAsync(Project project, CancellationToken cancellationToken = default)
     {
-        _context.Projects.Update(project);
+        // Only attach when detached — if already tracked (singleton DbContext),
+        // EF's change detection handles the update without forcing all related
+        // entities into Modified state (which would UPDATE newly-added children).
+        if (_context.Entry(project).State == EntityState.Detached)
+            _context.Projects.Update(project);
         return Task.CompletedTask;
     }
 
@@ -36,6 +40,9 @@ public class ProjectRepository : IProjectRepository
         if (project is not null)
             _context.Projects.Remove(project);
     }
+
+    public void TrackNewEventTag(EventTag tag) =>
+        _context.EventTags.Add(tag);
 
     private IQueryable<Project> FullGraph() =>
         _context.Projects

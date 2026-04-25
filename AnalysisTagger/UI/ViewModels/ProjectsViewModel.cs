@@ -1,4 +1,5 @@
 using AnalysisTagger.Application.DTOs;
+using AnalysisTagger.Application.Interfaces;
 using AnalysisTagger.Application.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -9,6 +10,8 @@ namespace AnalysisTagger.UI.ViewModels;
 public partial class ProjectsViewModel : ObservableObject
 {
     private readonly ProjectService _projectService;
+    private readonly INavigationService _navigation;
+    private readonly IDialogService _dialog;
 
     [ObservableProperty]
     private ObservableCollection<ProjectDto> _projects = [];
@@ -16,9 +19,11 @@ public partial class ProjectsViewModel : ObservableObject
     [ObservableProperty]
     private bool _isLoading;
 
-    public ProjectsViewModel(ProjectService projectService)
+    public ProjectsViewModel(ProjectService projectService, INavigationService navigation, IDialogService dialog)
     {
         _projectService = projectService;
+        _navigation = navigation;
+        _dialog = dialog;
     }
 
     [RelayCommand]
@@ -39,9 +44,7 @@ public partial class ProjectsViewModel : ObservableObject
     [RelayCommand]
     private async Task CreateProjectAsync()
     {
-        var name = await Shell.Current.DisplayPromptAsync(
-            "New Project", "Enter project name:", maxLength: 100);
-
+        var name = await _dialog.PromptAsync("New Project", "Enter project name:");
         if (string.IsNullOrWhiteSpace(name)) return;
 
         await _projectService.CreateProjectAsync(new CreateProjectDto { Title = name.Trim() });
@@ -51,6 +54,6 @@ public partial class ProjectsViewModel : ObservableObject
     [RelayCommand]
     private async Task OpenProjectAsync(ProjectDto project)
     {
-        await Shell.Current.GoToAsync($"AnalysisPage?projectId={project.Id}");
+        await _navigation.GoToAsync($"AnalysisPage?projectId={project.Id}");
     }
 }

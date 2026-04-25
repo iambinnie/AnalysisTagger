@@ -40,10 +40,27 @@ public class TaggingService
         };
 
         project.AddEvent(tag);
-        await _unitOfWork.Projects.UpdateAsync(project, cancellationToken);
+        _unitOfWork.Projects.TrackNewEventTag(tag);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return MapToDto(tag);
+    }
+
+    public async Task<(IEnumerable<CategoryDto> Categories, IEnumerable<EventTagDto> Tags)>
+        GetProjectSummaryAsync(Guid projectId, CancellationToken cancellationToken = default)
+    {
+        var project = await _unitOfWork.Projects.GetByIdAsync(projectId, cancellationToken)
+            ?? throw new ProjectNotFoundException(projectId);
+
+        var categories = project.Template.Categories
+            .OrderBy(c => c.SortOrder)
+            .Select(c => new CategoryDto { Id = c.Id, Name = c.Name, Color = c.Color, SortOrder = c.SortOrder });
+
+        var tags = project.Events
+            .OrderBy(e => e.StartTime.Value)
+            .Select(MapToDto);
+
+        return (categories, tags);
     }
 
     public async Task DeleteTagAsync(Guid projectId, Guid tagId, CancellationToken cancellationToken = default)

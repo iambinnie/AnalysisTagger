@@ -9,4 +9,5 @@ public interface IProjectRepository
     Task AddAsync(Project project, CancellationToken cancellationToken = default);
     Task UpdateAsync(Project project, CancellationToken cancellationToken = default);
     Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
+    void TrackNewEventTag(EventTag tag);
 }

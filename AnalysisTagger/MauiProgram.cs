@@ -5,6 +5,7 @@ using AnalysisTagger.Infrastructure.Data;
 using AnalysisTagger.Services;
 using AnalysisTagger.UI.Pages;
 using AnalysisTagger.UI.ViewModels;
+using NavigationService = AnalysisTagger.Services.NavigationService;
 using CommunityToolkit.Maui;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -34,6 +35,8 @@ public static class MauiProgram
 
         builder.Services.AddSingleton<MediaElementVideoPlayer>();
         builder.Services.AddSingleton<IVideoPlayer>(sp => sp.GetRequiredService<MediaElementVideoPlayer>());
+        builder.Services.AddSingleton<INavigationService, NavigationService>();
+        builder.Services.AddSingleton<IDialogService, DialogService>();
 
         builder.Services.AddSingleton<IUnitOfWork, UnitOfWork>();
         builder.Services.AddSingleton<ProjectService>();
