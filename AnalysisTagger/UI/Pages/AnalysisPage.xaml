@@ -3,27 +3,95 @@
     x:Class="AnalysisTagger.UI.Pages.AnalysisPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     Title="{Binding ProjectTitle}">
 
-    <VerticalStackLayout
-        HorizontalOptions="Center"
-        VerticalOptions="Center"
-        Spacing="16">
-        <Label
-            Text="Analysis"
-            FontSize="24"
-            FontAttributes="Bold"
-            HorizontalOptions="Center" />
-        <Label
-            Text="{Binding ProjectId, StringFormat='Project: {0}'}"
-            FontSize="14"
-            TextColor="Gray"
-            HorizontalOptions="Center" />
-        <Label
-            Text="Video player and tagging panel coming in the next phase."
-            FontSize="13"
-            TextColor="Gray"
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+    <ContentPage.Resources>
+        <toolkit:BoolToObjectConverter x:Key="PlayPauseText" TrueObject="⏸  Pause" FalseObject="▶  Play" />
+        <toolkit:InvertedBoolConverter x:Key="InvertBool" />
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="*,Auto,Auto" RowSpacing="4">
+
+        <!-- Video player -->
+        <toolkit:MediaElement
+            x:Name="VideoElement"
+            Grid.Row="0"
+            ShouldAutoPlay="False"
+            Aspect="AspectFit"
+            BackgroundColor="Black" />
+
+        <!-- Seek bar + timecodes -->
+        <Grid
+            Grid.Row="1"
+            ColumnDefinitions="80,*,80"
+            Margin="12,8"
+            ColumnSpacing="8">
+            <Label
+                Grid.Column="0"
+                Text="{Binding PositionText}"
+                FontSize="12"
+                FontFamily="OpenSansRegular"
+                VerticalOptions="Center"
+                HorizontalOptions="End" />
+            <Slider
+                Grid.Column="1"
+                x:Name="SeekSlider"
+                Minimum="0"
+                Maximum="{Binding DurationSeconds}"
+                Value="{Binding PositionSeconds, Mode=OneWay}"
+                IsEnabled="{Binding HasMedia}"
+                DragStarted="OnSeekDragStarted"
+                DragCompleted="OnSeekDragCompleted" />
+            <Label
+                Grid.Column="2"
+                Text="{Binding DurationText}"
+                FontSize="12"
+                FontFamily="OpenSansRegular"
+                VerticalOptions="Center"
+                HorizontalOptions="Start" />
+        </Grid>
+
+        <!-- Playback controls -->
+        <VerticalStackLayout Grid.Row="2" Spacing="8" Margin="12,8,12,12">
+
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="10">
+                <Button
+                    Text="📂  Load Video"
+                    Command="{Binding LoadVideoCommand}"
+                    WidthRequest="130" />
+                <Button
+                    Text="⏮ Frame"
+                    Command="{Binding StepBackwardCommand}"
+                    IsEnabled="{Binding HasMedia}"
+                    WidthRequest="90" />
+                <Button
+                    Text="⏹  Stop"
+                    Command="{Binding StopCommand}"
+                    IsEnabled="{Binding HasMedia}"
+                    WidthRequest="90" />
+                <Button
+                    Text="{Binding IsPlaying, Converter={StaticResource PlayPauseText}}"
+                    Command="{Binding PlayPauseCommand}"
+                    IsEnabled="{Binding HasMedia}"
+                    WidthRequest="110" />
+                <Button
+                    Text="Frame ⏭"
+                    Command="{Binding StepForwardCommand}"
+                    IsEnabled="{Binding HasMedia}"
+                    WidthRequest="90" />
+            </HorizontalStackLayout>
+
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="8">
+                <Label Text="Speed:" VerticalOptions="Center" />
+                <Button Text="0.25×" Command="{Binding SetRateCommand}" CommandParameter="0.25" IsEnabled="{Binding HasMedia}" WidthRequest="70" />
+                <Button Text="0.5×"  Command="{Binding SetRateCommand}" CommandParameter="0.5"  IsEnabled="{Binding HasMedia}" WidthRequest="60" />
+                <Button Text="1×"    Command="{Binding SetRateCommand}" CommandParameter="1.0"  IsEnabled="{Binding HasMedia}" WidthRequest="50" />
+                <Button Text="2×"    Command="{Binding SetRateCommand}" CommandParameter="2.0"  IsEnabled="{Binding HasMedia}" WidthRequest="50" />
+            </HorizontalStackLayout>
+
+        </VerticalStackLayout>
+
+    </Grid>
 
 </ContentPage>

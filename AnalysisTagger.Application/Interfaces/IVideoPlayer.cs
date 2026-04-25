@@ -14,6 +14,7 @@ public interface IVideoPlayer
     void Pause();
     void Stop();
     void Seek(Timecode position);
+    void SetSpeed(double rate);
 
     event EventHandler<Timecode>? PositionChanged;
     event EventHandler? MediaLoaded;

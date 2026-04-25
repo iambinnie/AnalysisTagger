@@ -2,8 +2,10 @@ using AnalysisTagger.Application.Interfaces;
 using AnalysisTagger.Application.Services;
 using AnalysisTagger.Infrastructure;
 using AnalysisTagger.Infrastructure.Data;
+using AnalysisTagger.Services;
 using AnalysisTagger.UI.Pages;
 using AnalysisTagger.UI.ViewModels;
+using CommunityToolkit.Maui;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -16,6 +18,8 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
+            .UseMauiCommunityToolkit()
+            .UseMauiCommunityToolkitMediaElement(false)
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -27,6 +31,9 @@ public static class MauiProgram
             var dbPath = Path.Combine(FileSystem.AppDataDirectory, "analysistagger.db");
             options.UseSqlite($"Data Source={dbPath}");
         }, ServiceLifetime.Singleton);
+
+        builder.Services.AddSingleton<MediaElementVideoPlayer>();
+        builder.Services.AddSingleton<IVideoPlayer>(sp => sp.GetRequiredService<MediaElementVideoPlayer>());
 
         builder.Services.AddSingleton<IUnitOfWork, UnitOfWork>();
         builder.Services.AddSingleton<ProjectService>();

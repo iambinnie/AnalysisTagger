@@ -10,6 +10,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `LibVLCSharp` `VideoView` was rejected — renders in a separate OS window, cannot be embedded in MAUI layout.
 - `MediaElement` (CommunityToolkit.Maui) passed all embedding tests on Windows and is the selected video player.
 
+**Validated package versions from PoC** — use these exactly, do not attempt to upgrade blindly:
+- `<MauiVersion>10.0.41</MauiVersion>` — must be pinned in the MAUI app's `PropertyGroup`. The workload ships 10.0.20; without this pin the CommunityToolkit packages fail to restore.
+- `CommunityToolkit.Maui` — `14.1.0`
+- `CommunityToolkit.Maui.MediaElement` — `9.0.0`
+- `CommunityToolkit.Mvvm` — `8.4.0` (PoC used 8.4.2, either works)
+
+**CommunityToolkit.Maui API notes (9.0.0):**
+- Registration: `.UseMauiCommunityToolkit()` then `.UseMauiCommunityToolkitMediaElement(false)` — the `false` parameter (Android foreground service) is required.
+- `MediaElement` is in namespace `CommunityToolkit.Maui.Views`.
+- `MediaElementState` (e.g. `.Playing`) is in `CommunityToolkit.Maui.Core.Primitives`.
+- `MediaElement.Duration` is `TimeSpan` (not nullable) in 9.0.0 — do not call `.Value` on it.
+- `MediaElement.PositionChanged` event args type is not publicly named in 9.0.0 — use a lambda `(_, e) => e.Position` rather than a named handler with explicit args type.
+
 ## Environment
 
 - **IDE**: Visual Studio 2026 Community
@@ -80,24 +93,24 @@ Clean Architecture with strict layer boundaries. Dependency direction: UI → Ap
 - `SportType`: Generic, Football, Basketball, Rugby, Hockey, Tennis, Custom
 - `TaggingMode`: LiveTagging (real-time) vs PostTagging (post-match review)
 
-### Application Layer (`Application/`) — *not yet implemented*
+### Application Layer (`Application/`)
 
-Will contain interfaces (e.g. `IVideoPlayer`, `IVideoExporter`, repository contracts), application services, DTOs, and domain exceptions.
+Interfaces (`IProjectRepository`, `IUnitOfWork`, `IVideoPlayer`, `IVideoExporter`), services (`ProjectService`, `TaggingService`, `PlaylistService`, `ExportService`), DTOs, and domain exceptions.
 
-### Infrastructure Layer — *not yet implemented*
+### Infrastructure Layer
 
-- **Database**: EF Core + SQLite. Repository pattern with Unit of Work.
-- **Video**: `MediaElement`-based `IVideoPlayer` implementation.
-- **Export**: `Xabe.FFmpeg`-based `IVideoExporter` implementation.
+- **Database** (`AnalysisTagger.Infrastructure`): EF Core + SQLite, `AppDbContext`, `ProjectRepository`, `UnitOfWork`. Migrations in `Migrations/`. Targets both `net10.0` (for `dotnet ef` tooling) and MAUI platform targets.
+- **Video** (`AnalysisTagger/Services/MediaElementVideoPlayer.cs`): `IVideoPlayer` implemented with `MediaElement`. Lives in the MAUI app project (not Infrastructure) because `MediaElement` is a MAUI UI control. Call `Attach(MediaElement)` / `Detach()` from the page's `OnAppearing` / `OnDisappearing`.
+- **Export**: `IVideoExporter` with `Xabe.FFmpeg` — not yet implemented.
 
 ### UI / Presentation Layer
 
-- `MauiProgram.cs` — composition root; MAUI DI, fonts, logging.
-- `AppShell.xaml` — navigation shell; add new routes here.
-- `App.xaml` — merges `Resources/Styles/Colors.xaml` and `Resources/Styles/Styles.xaml`.
-- `MainPage.xaml` — placeholder; will be replaced during UI build phase.
+- `MauiProgram.cs` — composition root; DI registrations, migrations on startup.
+- `AppShell.xaml` — `ProjectsPage` as root; `AnalysisPage` registered as a route.
+- `UI/Pages/` — `ProjectsPage`, `AnalysisPage`.
+- `UI/ViewModels/` — `ProjectsViewModel`, `AnalysisViewModel`.
 
-Planned UI components: `TaggingPanelView`, `TimelineView`, `PitchOverlayView` (with `PitchDrawable`).
+Planned: `TaggingPanelView`, `TimelineView`, `PitchOverlayView` (with `PitchDrawable`).
 
 ### Data Flow
 

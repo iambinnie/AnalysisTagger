@@ -19,7 +19,7 @@ public partial class ProjectsPage : ContentPage
         await _viewModel.LoadProjectsCommand.ExecuteAsync(null);
     }
 
-    private async void OnProjectSelectionChanged(object sender, SelectionChangedEventArgs e)
+    private async void OnProjectSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
         if (e.CurrentSelection.FirstOrDefault() is not ProjectDto project) return;
         ProjectsCollection.SelectedItem = null;
