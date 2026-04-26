@@ -8,10 +8,12 @@ public class UnitOfWork : IUnitOfWork
 {
     private readonly AppDbContext _context;
     private ProjectRepository? _projects;
+    private TeamRepository? _teams;
 
     public UnitOfWork(AppDbContext context) => _context = context;
 
     public IProjectRepository Projects => _projects ??= new ProjectRepository(_context);
+    public ITeamRepository Teams => _teams ??= new TeamRepository(_context);
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default) =>
         _context.SaveChangesAsync(cancellationToken);

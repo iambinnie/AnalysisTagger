@@ -8,8 +8,8 @@
     FlyoutBehavior="Disabled">
 
     <ShellContent
-        Title="Projects"
-        ContentTemplate="{DataTemplate pages:ProjectsPage}"
-        Route="ProjectsPage" />
+        Title="Home"
+        ContentTemplate="{DataTemplate pages:MainMenuPage}"
+        Route="MainMenuPage" />
 
 </Shell>

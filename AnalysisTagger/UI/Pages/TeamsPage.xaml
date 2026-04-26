@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AnalysisTagger.UI.Pages.TeamsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:dto="clr-namespace:AnalysisTagger.Application.DTOs;assembly=AnalysisTagger.Application"
+    x:Name="ThisPage"
+    Title="Teams">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Toolbar -->
+        <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End" Padding="12,8" Spacing="8">
+            <Button Text="+ Add Team" Command="{Binding AddTeamCommand}" />
+        </HorizontalStackLayout>
+
+        <!-- Team list -->
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Teams}">
+            <CollectionView.EmptyView>
+                <Label
+                    Text="No teams yet — tap '+ Add Team' to create one"
+                    TextColor="Gray"
+                    FontSize="13"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    HorizontalTextAlignment="Center"
+                    Margin="16" />
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="dto:TeamDto">
+                    <Grid ColumnDefinitions="56,*,Auto,Auto" Padding="12,8" ColumnSpacing="12">
+
+                        <!-- Shield image or placeholder -->
+                        <Border
+                            Grid.Column="0"
+                            WidthRequest="48"
+                            HeightRequest="48"
+                            StrokeShape="RoundRectangle 4"
+                            Stroke="LightGray"
+                            StrokeThickness="1">
+                            <Image
+                                Source="{Binding ShieldImagePath}"
+                                Aspect="AspectFit"
+                                IsVisible="{Binding ShieldImagePath, Converter={toolkit:IsNotNullOrEmptyConverter}}" />
+                        </Border>
+
+                        <!-- Team info -->
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                            <VerticalStackLayout.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.OpenRosterCommand}"
+                                    CommandParameter="{Binding .}" />
+                            </VerticalStackLayout.GestureRecognizers>
+                            <Label Text="{Binding Name}" FontSize="15" FontAttributes="Bold" />
+                            <Label FontSize="12" TextColor="Gray">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="{Binding PlayerCount}" />
+                                        <Span Text=" player(s)" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </VerticalStackLayout>
+
+                        <!-- Edit -->
+                        <Button
+                            Grid.Column="2"
+                            Text="✏️"
+                            FontSize="13"
+                            WidthRequest="40"
+                            HeightRequest="40"
+                            Padding="0"
+                            BackgroundColor="Transparent"
+                            Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.EditTeamCommand}"
+                            CommandParameter="{Binding .}" />
+
+                        <!-- Delete -->
+                        <Button
+                            Grid.Column="3"
+                            Text="🗑"
+                            FontSize="13"
+                            WidthRequest="40"
+                            HeightRequest="40"
+                            Padding="0"
+                            BackgroundColor="Transparent"
+                            Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.DeleteTeamCommand}"
+                            CommandParameter="{Binding .}" />
+
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+    </Grid>
+
+</ContentPage>

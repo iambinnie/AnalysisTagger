@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AnalysisTagger.UI.Pages.AddEditTeamPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    Title="{Binding PageTitle}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="16">
+
+            <!-- Team Name -->
+            <Label Text="Team Name" FontAttributes="Bold" />
+            <Entry
+                Placeholder="e.g. Arsenal FC"
+                Text="{Binding Name}"
+                MaxLength="100" />
+
+            <!-- Shield Image -->
+            <Label Text="Shield / Badge Image" FontAttributes="Bold" Margin="0,8,0,0" />
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                <Entry
+                    Grid.Column="0"
+                    Text="{Binding ShieldImagePath}"
+                    Placeholder="No image selected"
+                    IsReadOnly="True" />
+                <Button
+                    Grid.Column="1"
+                    Text="Browse…"
+                    Command="{Binding PickShieldImageCommand}"
+                    WidthRequest="90" />
+            </Grid>
+
+            <!-- Shield preview -->
+            <Image
+                Source="{Binding ShieldImagePath}"
+                HeightRequest="96"
+                Aspect="AspectFit"
+                HorizontalOptions="Start"
+                IsVisible="{Binding ShieldImagePath, Converter={toolkit:IsNotNullOrEmptyConverter}}" />
+
+            <!-- Actions -->
+            <HorizontalStackLayout HorizontalOptions="End" Spacing="8" Margin="0,16,0,0">
+                <Button Text="Cancel" Command="{Binding CancelCommand}" BackgroundColor="Gray" />
+                <Button Text="Save"   Command="{Binding SaveCommand}" />
+            </HorizontalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

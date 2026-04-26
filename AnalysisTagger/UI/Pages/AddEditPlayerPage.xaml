@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AnalysisTagger.UI.Pages.AddEditPlayerPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    Title="{Binding PageTitle}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="16">
+
+            <!-- Name -->
+            <Label Text="Name" FontAttributes="Bold" />
+            <Entry Placeholder="e.g. John Smith" Text="{Binding Name}" MaxLength="100" />
+
+            <!-- Shirt Number -->
+            <Label Text="Shirt Number" FontAttributes="Bold" Margin="0,8,0,0" />
+            <Entry
+                Placeholder="e.g. 9"
+                Text="{Binding ShirtNumber}"
+                Keyboard="Numeric"
+                MaxLength="3" />
+
+            <!-- Position -->
+            <Label Text="Position" FontAttributes="Bold" Margin="0,8,0,0" />
+            <Entry Placeholder="e.g. Striker" Text="{Binding Position}" MaxLength="50" />
+
+            <!-- Photo -->
+            <Label Text="Photo" FontAttributes="Bold" Margin="0,8,0,0" />
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                <Entry
+                    Grid.Column="0"
+                    Text="{Binding PhotoPath}"
+                    Placeholder="No photo selected"
+                    IsReadOnly="True" />
+                <Button
+                    Grid.Column="1"
+                    Text="Browse…"
+                    Command="{Binding PickPhotoCommand}"
+                    WidthRequest="90" />
+            </Grid>
+
+            <Image
+                Source="{Binding PhotoPath}"
+                HeightRequest="96"
+                WidthRequest="96"
+                Aspect="AspectFill"
+                HorizontalOptions="Start"
+                IsVisible="{Binding PhotoPath, Converter={toolkit:IsNotNullOrEmptyConverter}}" />
+
+            <!-- Actions -->
+            <HorizontalStackLayout HorizontalOptions="End" Spacing="8" Margin="0,16,0,0">
+                <Button Text="Cancel" Command="{Binding CancelCommand}" BackgroundColor="Gray" />
+                <Button Text="Save"   Command="{Binding SaveCommand}" />
+            </HorizontalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

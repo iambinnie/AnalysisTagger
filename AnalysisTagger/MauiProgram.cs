@@ -42,11 +42,23 @@ public static class MauiProgram
         builder.Services.AddSingleton<ProjectService>();
         builder.Services.AddSingleton<TaggingService>();
         builder.Services.AddSingleton<PlaylistService>();
+        builder.Services.AddSingleton<TeamService>();
 
+        builder.Services.AddTransient<MainMenuViewModel>();
         builder.Services.AddTransient<ProjectsViewModel>();
         builder.Services.AddTransient<AnalysisViewModel>();
+        builder.Services.AddTransient<TeamsViewModel>();
+        builder.Services.AddTransient<AddEditTeamViewModel>();
+        builder.Services.AddTransient<TeamRosterViewModel>();
+        builder.Services.AddTransient<AddEditPlayerViewModel>();
+
+        builder.Services.AddTransient<MainMenuPage>();
         builder.Services.AddTransient<ProjectsPage>();
         builder.Services.AddTransient<AnalysisPage>();
+        builder.Services.AddTransient<TeamsPage>();
+        builder.Services.AddTransient<AddEditTeamPage>();
+        builder.Services.AddTransient<TeamRosterPage>();
+        builder.Services.AddTransient<AddEditPlayerPage>();
         builder.Services.AddSingleton<AppShell>();
 
 #if DEBUG

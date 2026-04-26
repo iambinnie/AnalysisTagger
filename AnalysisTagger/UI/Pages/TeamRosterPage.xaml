@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AnalysisTagger.UI.Pages.TeamRosterPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:dto="clr-namespace:AnalysisTagger.Application.DTOs;assembly=AnalysisTagger.Application"
+    x:Name="ThisPage"
+    Title="{Binding TeamName}">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Toolbar -->
+        <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End" Padding="12,8" Spacing="8">
+            <Button Text="+ Add Player" Command="{Binding AddPlayerCommand}" />
+        </HorizontalStackLayout>
+
+        <!-- Player list -->
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Players}">
+            <CollectionView.EmptyView>
+                <Label
+                    Text="No players in the squad — tap '+ Add Player'"
+                    TextColor="Gray"
+                    FontSize="13"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    HorizontalTextAlignment="Center"
+                    Margin="16" />
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="dto:PlayerDto">
+                    <Grid ColumnDefinitions="48,48,*,Auto,Auto" Padding="12,8" ColumnSpacing="10">
+
+                        <!-- Shirt number -->
+                        <Border
+                            Grid.Column="0"
+                            WidthRequest="40"
+                            HeightRequest="40"
+                            BackgroundColor="#3498DB"
+                            StrokeShape="RoundRectangle 20">
+                            <Label
+                                Text="{Binding ShirtNumber}"
+                                TextColor="White"
+                                FontAttributes="Bold"
+                                FontSize="14"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center" />
+                        </Border>
+
+                        <!-- Photo or placeholder -->
+                        <Border
+                            Grid.Column="1"
+                            WidthRequest="40"
+                            HeightRequest="40"
+                            StrokeShape="RoundRectangle 20"
+                            Stroke="LightGray"
+                            StrokeThickness="1">
+                            <Image
+                                Source="{Binding PhotoPath}"
+                                Aspect="AspectFill"
+                                IsVisible="{Binding PhotoPath, Converter={toolkit:IsNotNullOrEmptyConverter}}" />
+                        </Border>
+
+                        <!-- Name + position -->
+                        <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" Spacing="2">
+                            <Label Text="{Binding Name}" FontSize="14" FontAttributes="Bold" />
+                            <Label
+                                Text="{Binding Position}"
+                                FontSize="12"
+                                TextColor="Gray"
+                                IsVisible="{Binding Position, Converter={toolkit:IsNotNullOrEmptyConverter}}" />
+                        </VerticalStackLayout>
+
+                        <!-- Edit -->
+                        <Button
+                            Grid.Column="3"
+                            Text="✏️"
+                            FontSize="13"
+                            WidthRequest="40"
+                            HeightRequest="40"
+                            Padding="0"
+                            BackgroundColor="Transparent"
+                            Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.EditPlayerCommand}"
+                            CommandParameter="{Binding .}" />
+
+                        <!-- Delete -->
+                        <Button
+                            Grid.Column="4"
+                            Text="🗑"
+                            FontSize="13"
+                            WidthRequest="40"
+                            HeightRequest="40"
+                            Padding="0"
+                            BackgroundColor="Transparent"
+                            Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.DeletePlayerCommand}"
+                            CommandParameter="{Binding .}" />
+
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+    </Grid>
+
+</ContentPage>

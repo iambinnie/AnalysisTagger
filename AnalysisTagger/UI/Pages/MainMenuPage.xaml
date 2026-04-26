@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AnalysisTagger.UI.Pages.MainMenuPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="AnalysisTagger">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="16">
+
+            <Label
+                Text="AnalysisTagger"
+                FontSize="28"
+                FontAttributes="Bold"
+                HorizontalOptions="Center"
+                Margin="0,16,0,8" />
+
+            <!-- Matches / Projects -->
+            <Border Stroke="#3498DB" StrokeThickness="1" StrokeShape="RoundRectangle 8">
+                <Grid ColumnDefinitions="Auto,*" Padding="16" ColumnSpacing="16">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToProjectsCommand}" />
+                    </Grid.GestureRecognizers>
+                    <Label Grid.Column="0" Text="📋" FontSize="36" VerticalOptions="Center" />
+                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                        <Label Text="Matches" FontSize="18" FontAttributes="Bold" />
+                        <Label Text="Create and open analysis sessions" FontSize="13" TextColor="Gray" />
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+
+            <!-- Teams -->
+            <Border Stroke="#2ECC71" StrokeThickness="1" StrokeShape="RoundRectangle 8">
+                <Grid ColumnDefinitions="Auto,*" Padding="16" ColumnSpacing="16">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToTeamsCommand}" />
+                    </Grid.GestureRecognizers>
+                    <Label Grid.Column="0" Text="👥" FontSize="36" VerticalOptions="Center" />
+                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                        <Label Text="Teams" FontSize="18" FontAttributes="Bold" />
+                        <Label Text="Manage squads and player rosters" FontSize="13" TextColor="Gray" />
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+
+            <!-- Templates (placeholder) -->
+            <Border Stroke="LightGray" StrokeThickness="1" StrokeShape="RoundRectangle 8" Opacity="0.5">
+                <Grid ColumnDefinitions="Auto,*" Padding="16" ColumnSpacing="16">
+                    <Label Grid.Column="0" Text="🏷️" FontSize="36" VerticalOptions="Center" />
+                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                        <Label Text="Tag Templates" FontSize="18" FontAttributes="Bold" />
+                        <Label Text="Define categories and tagging presets" FontSize="13" TextColor="Gray" />
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+
+            <!-- Playlists (placeholder) -->
+            <Border Stroke="LightGray" StrokeThickness="1" StrokeShape="RoundRectangle 8" Opacity="0.5">
+                <Grid ColumnDefinitions="Auto,*" Padding="16" ColumnSpacing="16">
+                    <Label Grid.Column="0" Text="▶️" FontSize="36" VerticalOptions="Center" />
+                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                        <Label Text="Playlists" FontSize="18" FontAttributes="Bold" />
+                        <Label Text="Review and organise tagged clips" FontSize="13" TextColor="Gray" />
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+
+            <!-- Export (placeholder) -->
+            <Border Stroke="LightGray" StrokeThickness="1" StrokeShape="RoundRectangle 8" Opacity="0.5">
+                <Grid ColumnDefinitions="Auto,*" Padding="16" ColumnSpacing="16">
+                    <Label Grid.Column="0" Text="📤" FontSize="36" VerticalOptions="Center" />
+                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                        <Label Text="Export" FontSize="18" FontAttributes="Bold" />
+                        <Label Text="Export clips and reports" FontSize="13" TextColor="Gray" />
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
