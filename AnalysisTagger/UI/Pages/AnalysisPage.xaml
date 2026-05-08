@@ -9,6 +9,11 @@
     xmlns:converters="clr-namespace:AnalysisTagger.UI.Converters"
     Title="{Binding ProjectTitle}">
 
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Assign Template" Command="{Binding AssignTemplateCommand}" Order="Primary" />
+        <ToolbarItem Text="Edit Template"   Command="{Binding EditTemplateCommand}"   Order="Primary" />
+    </ContentPage.ToolbarItems>
+
     <ContentPage.Resources>
         <toolkit:BoolToObjectConverter x:Key="PlayPauseText" TrueObject="⏸  Pause" FalseObject="▶  Play" />
         <converters:HexColorConverter x:Key="HexColor" />

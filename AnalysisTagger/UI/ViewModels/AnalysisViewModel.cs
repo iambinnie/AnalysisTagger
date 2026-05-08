@@ -13,8 +13,13 @@ public partial class AnalysisViewModel : ObservableObject, IDisposable
 {
     private readonly ProjectService _projectService;
     private readonly TaggingService _taggingService;
+    private readonly TemplateService _templateService;
     private readonly IVideoPlayer _videoPlayer;
+    private readonly INavigationService _navigation;
+    private readonly IDialogService _dialog;
+
     private Guid _currentProjectId;
+    private Guid _currentTemplateId;
 
     [ObservableProperty] private bool _isPlaying;
     [ObservableProperty] private bool _hasMedia;
@@ -24,16 +29,26 @@ public partial class AnalysisViewModel : ObservableObject, IDisposable
     [ObservableProperty] private double _durationSeconds = 1;
     [ObservableProperty] private string _projectId = string.Empty;
     [ObservableProperty] private string _projectTitle = "Analysis";
+    [ObservableProperty] private string _templateName = string.Empty;
     [ObservableProperty] private ObservableCollection<CategoryDto> _categories = [];
     [ObservableProperty] private ObservableCollection<EventTagDto> _events = [];
 
     public bool IsSeeking { get; set; }
 
-    public AnalysisViewModel(ProjectService projectService, TaggingService taggingService, IVideoPlayer videoPlayer)
+    public AnalysisViewModel(
+        ProjectService projectService,
+        TaggingService taggingService,
+        TemplateService templateService,
+        IVideoPlayer videoPlayer,
+        INavigationService navigation,
+        IDialogService dialog)
     {
         _projectService = projectService;
         _taggingService = taggingService;
+        _templateService = templateService;
         _videoPlayer = videoPlayer;
+        _navigation = navigation;
+        _dialog = dialog;
         _videoPlayer.PositionChanged += OnPositionChanged;
         _videoPlayer.MediaLoaded += OnMediaLoaded;
         _videoPlayer.PlaybackEnded += OnPlaybackEnded;
@@ -48,10 +63,12 @@ public partial class AnalysisViewModel : ObservableObject, IDisposable
         }
     }
 
-    private async Task LoadProjectAsync()
+    internal async Task LoadProjectAsync()
     {
         var project = await _projectService.GetProjectAsync(_currentProjectId);
         ProjectTitle = project.Title;
+        TemplateName = project.TemplateName;
+        _currentTemplateId = project.TemplateId;
 
         var (categories, tags) = await _taggingService.GetProjectSummaryAsync(_currentProjectId);
         Categories = new ObservableCollection<CategoryDto>(categories);
@@ -63,6 +80,34 @@ public partial class AnalysisViewModel : ObservableObject, IDisposable
         var (_, tags) = await _taggingService.GetProjectSummaryAsync(_currentProjectId);
         Events = new ObservableCollection<EventTagDto>(tags);
     }
+
+    [RelayCommand]
+    private async Task AssignTemplateAsync()
+    {
+        var templates = (await _templateService.GetAllTemplatesAsync()).ToList();
+        if (templates.Count == 0)
+        {
+            await _dialog.AlertAsync("No Templates", "Create a template in the Tag Templates section first.");
+            return;
+        }
+
+        var chosen = await _dialog.ActionSheetAsync(
+            "Select Template",
+            "Cancel",
+            templates.Select(t => t.Name));
+
+        if (string.IsNullOrEmpty(chosen)) return;
+
+        var template = templates.FirstOrDefault(t => t.Name == chosen);
+        if (template is null) return;
+
+        await _projectService.AssignTemplateAsync(_currentProjectId, template.Id);
+        await LoadProjectAsync();
+    }
+
+    [RelayCommand]
+    private Task EditTemplateAsync() =>
+        _navigation.GoToAsync($"{nameof(Pages.TemplateEditorPage)}?templateId={_currentTemplateId}");
 
     [RelayCommand]
     private async Task LoadVideoAsync()

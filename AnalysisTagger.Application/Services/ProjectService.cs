@@ -59,6 +59,37 @@ public class ProjectService
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task AssignTemplateAsync(Guid projectId, Guid libraryTemplateId, CancellationToken cancellationToken = default)
+    {
+        var project = await _unitOfWork.Projects.GetByIdAsync(projectId, cancellationToken)
+            ?? throw new ProjectNotFoundException(projectId);
+        var library = await _unitOfWork.Templates.GetByIdAsync(libraryTemplateId, cancellationToken)
+            ?? throw new TemplateNotFoundException(libraryTemplateId);
+
+        project.Template.Name = library.Name;
+        project.Template.Sport = library.Sport;
+        project.Template.Categories.Clear();
+
+        foreach (var cat in library.Categories.OrderBy(c => c.SortOrder))
+        {
+            var copy = new Category
+            {
+                Name = cat.Name,
+                Color = cat.Color,
+                DefaultLeadTime = cat.DefaultLeadTime,
+                DefaultLagTime = cat.DefaultLagTime,
+                SubCategories = cat.SubCategories.ToList(),
+                SortOrder = cat.SortOrder
+            };
+            project.Template.Categories.Add(copy);
+            _unitOfWork.Projects.TrackNewCategory(copy);
+        }
+
+        project.LastModifiedAt = DateTime.UtcNow;
+        await _unitOfWork.Projects.UpdateAsync(project, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
     public async Task DeleteProjectAsync(Guid id, CancellationToken cancellationToken = default)
     {
         _ = await _unitOfWork.Projects.GetByIdAsync(id, cancellationToken)
@@ -80,6 +111,8 @@ public class ProjectService
         VideoFilePath = project.VideoFilePath,
         CreatedAt = project.CreatedAt,
         LastModifiedAt = project.LastModifiedAt,
+        TemplateId = project.Template?.Id ?? Guid.Empty,
+        TemplateName = project.Template?.Name ?? string.Empty,
         EventCount = project.Events.Count
     };
 }

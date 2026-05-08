@@ -7,6 +7,7 @@ public partial class AnalysisPage : ContentPage
 {
     private readonly AnalysisViewModel _viewModel;
     private readonly MediaElementVideoPlayer _videoPlayer;
+    private bool _initialNavigationComplete;
 
     public AnalysisPage(AnalysisViewModel viewModel, MediaElementVideoPlayer videoPlayer)
     {
@@ -19,6 +20,11 @@ public partial class AnalysisPage : ContentPage
     {
         base.OnAppearing();
         _videoPlayer.Attach(VideoElement);
+
+        if (_initialNavigationComplete)
+            _ = _viewModel.LoadProjectAsync();
+        else
+            _initialNavigationComplete = true;
     }
 
     protected override void OnDisappearing()

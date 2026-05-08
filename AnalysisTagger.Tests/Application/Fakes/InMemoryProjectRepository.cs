@@ -31,6 +31,7 @@ public class InMemoryProjectRepository : IProjectRepository
         return Task.CompletedTask;
     }
 
-    // No-op: entity is already in project.Events via domain AddEvent; no EF context to inform.
+    // No-op: entity is already in the domain collection; no EF context to inform.
     public void TrackNewEventTag(EventTag tag) { }
+    public void TrackNewCategory(Category category) { }
 }

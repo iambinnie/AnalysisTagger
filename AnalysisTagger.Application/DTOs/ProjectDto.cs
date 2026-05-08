@@ -14,5 +14,7 @@ public class ProjectDto
     public string VideoFilePath { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
     public DateTime LastModifiedAt { get; set; }
+    public Guid TemplateId { get; set; }
+    public string TemplateName { get; set; } = string.Empty;
     public int EventCount { get; set; }
 }

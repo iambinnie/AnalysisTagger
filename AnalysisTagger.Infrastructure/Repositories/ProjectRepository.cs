@@ -44,6 +44,9 @@ public class ProjectRepository : IProjectRepository
     public void TrackNewEventTag(EventTag tag) =>
         _context.EventTags.Add(tag);
 
+    public void TrackNewCategory(Category category) =>
+        _context.Categories.Add(category);
+
     private IQueryable<Project> FullGraph() =>
         _context.Projects
             .Include(p => p.Template).ThenInclude(t => t.Categories)

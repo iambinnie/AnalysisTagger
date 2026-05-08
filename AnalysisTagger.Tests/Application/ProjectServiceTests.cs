@@ -2,6 +2,7 @@ using AnalysisTagger.Application.DTOs;
 using AnalysisTagger.Application.Exceptions;
 using AnalysisTagger.Application.Services;
 using AnalysisTagger.Domain.Enums;
+using AnalysisTagger.Domain.Models;
 using AnalysisTagger.Tests.Application.Fakes;
 using FluentAssertions;
 
@@ -118,6 +119,75 @@ public class ProjectServiceTests
         var act = async () => await svc.DeleteProjectAsync(Guid.NewGuid());
 
         await act.Should().ThrowAsync<ProjectNotFoundException>();
+    }
+
+    [Fact]
+    public async Task AssignTemplateAsync_ReplacesProjectCategoriesWithCopiesFromLibrary()
+    {
+        var (svc, uow) = Create();
+        var project = await svc.CreateProjectAsync(DefaultDto());
+
+        var library = new TagTemplate
+        {
+            Name = "Custom",
+            Sport = SportType.Rugby,
+            Categories = new List<Category>
+            {
+                new() { Name = "Tackle", Color = "#E74C3C", SortOrder = 1 },
+                new() { Name = "Lineout", Color = "#2ECC71", SortOrder = 2 }
+            }
+        };
+        await uow.TemplateRepository.AddAsync(library);
+
+        await svc.AssignTemplateAsync(project.Id, library.Id);
+
+        var stored = await uow.Projects.GetByIdAsync(project.Id);
+        stored!.Template.Name.Should().Be("Custom");
+        stored.Template.Sport.Should().Be(SportType.Rugby);
+        stored.Template.Categories.Should().HaveCount(2);
+        stored.Template.Categories.Select(c => c.Name).Should().Contain("Tackle").And.Contain("Lineout");
+    }
+
+    [Fact]
+    public async Task AssignTemplateAsync_CopiesAreSeparateInstances()
+    {
+        var (svc, uow) = Create();
+        var project = await svc.CreateProjectAsync(DefaultDto());
+
+        var library = new TagTemplate
+        {
+            Name = "Library",
+            Categories = new List<Category> { new() { Name = "Shot", SortOrder = 1 } }
+        };
+        await uow.TemplateRepository.AddAsync(library);
+
+        await svc.AssignTemplateAsync(project.Id, library.Id);
+
+        var stored = await uow.Projects.GetByIdAsync(project.Id);
+        stored!.Template.Categories[0].Id.Should().NotBe(library.Categories[0].Id);
+    }
+
+    [Fact]
+    public async Task AssignTemplateAsync_ThrowsWhenProjectNotFound()
+    {
+        var (svc, uow) = Create();
+        var library = new TagTemplate { Name = "X" };
+        await uow.TemplateRepository.AddAsync(library);
+
+        var act = async () => await svc.AssignTemplateAsync(Guid.NewGuid(), library.Id);
+
+        await act.Should().ThrowAsync<ProjectNotFoundException>();
+    }
+
+    [Fact]
+    public async Task AssignTemplateAsync_ThrowsWhenTemplateNotFound()
+    {
+        var (svc, _) = Create();
+        var project = await svc.CreateProjectAsync(DefaultDto());
+
+        var act = async () => await svc.AssignTemplateAsync(project.Id, Guid.NewGuid());
+
+        await act.Should().ThrowAsync<TemplateNotFoundException>();
     }
 
     [Fact]
