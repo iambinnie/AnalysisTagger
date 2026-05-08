@@ -16,15 +16,12 @@ public partial class AnalysisViewModel : ObservableObject, IDisposable
     private readonly IVideoPlayer _videoPlayer;
     private Guid _currentProjectId;
 
-    // Video player state
     [ObservableProperty] private bool _isPlaying;
     [ObservableProperty] private bool _hasMedia;
     [ObservableProperty] private string _positionText = "00:00:00.00";
     [ObservableProperty] private string _durationText = "00:00:00.00";
     [ObservableProperty] private double _positionSeconds;
     [ObservableProperty] private double _durationSeconds = 1;
-
-    // Project state
     [ObservableProperty] private string _projectId = string.Empty;
     [ObservableProperty] private string _projectTitle = "Analysis";
     [ObservableProperty] private ObservableCollection<CategoryDto> _categories = [];
@@ -66,8 +63,6 @@ public partial class AnalysisViewModel : ObservableObject, IDisposable
         var (_, tags) = await _taggingService.GetProjectSummaryAsync(_currentProjectId);
         Events = new ObservableCollection<EventTagDto>(tags);
     }
-
-    // ── Video commands ──────────────────────────────────────────────
 
     [RelayCommand]
     private async Task LoadVideoAsync()
@@ -122,8 +117,6 @@ public partial class AnalysisViewModel : ObservableObject, IDisposable
     public void SeekToSeconds(double seconds) =>
         _videoPlayer.Seek(Timecode.FromSeconds(seconds));
 
-    // ── Tagging commands ────────────────────────────────────────────
-
     [RelayCommand]
     private async Task TagEventAsync(CategoryDto category)
     {
@@ -145,8 +138,6 @@ public partial class AnalysisViewModel : ObservableObject, IDisposable
         await _taggingService.DeleteTagAsync(_currentProjectId, eventTag.Id);
         await RefreshEventsAsync();
     }
-
-    // ── Video player event handlers ─────────────────────────────────
 
     private void OnPositionChanged(object? sender, Timecode position)
     {

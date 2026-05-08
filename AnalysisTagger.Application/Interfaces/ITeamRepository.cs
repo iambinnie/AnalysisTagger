@@ -9,4 +9,5 @@ public interface ITeamRepository
     Task AddAsync(Team team, CancellationToken cancellationToken = default);
     Task UpdateAsync(Team team, CancellationToken cancellationToken = default);
     Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
+    void TrackNewPlayer(Player player);
 }

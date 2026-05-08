@@ -39,4 +39,7 @@ public class TeamRepository : ITeamRepository
         if (team is not null)
             _context.Teams.Remove(team);
     }
+
+    public void TrackNewPlayer(Player player) =>
+        _context.Players.Add(player);
 }

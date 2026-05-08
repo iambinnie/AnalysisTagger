@@ -14,7 +14,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `<MauiVersion>10.0.41</MauiVersion>` — must be pinned in the MAUI app's `PropertyGroup`. The workload ships 10.0.20; without this pin the CommunityToolkit packages fail to restore.
 - `CommunityToolkit.Maui` — `14.1.0`
 - `CommunityToolkit.Maui.MediaElement` — `9.0.0`
-- `CommunityToolkit.Mvvm` — `8.4.0` (PoC used 8.4.2, either works)
+- `CommunityToolkit.Mvvm` — `8.4.0` (PoC used 8.4.2, either works). Use field-based `[ObservableProperty]` syntax only — the partial property variant emits MVVMTK0045 but the source generator does not implement it in this version. MVVMTK0045 is suppressed via `<NoWarn>` in the MAUI csproj.
 
 **CommunityToolkit.Maui API notes (9.0.0):**
 - Registration: `.UseMauiCommunityToolkit()` then `.UseMauiCommunityToolkitMediaElement(false)` — the `false` parameter (Android foreground service) is required.

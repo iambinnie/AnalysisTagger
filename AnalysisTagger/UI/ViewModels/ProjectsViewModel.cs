@@ -13,11 +13,8 @@ public partial class ProjectsViewModel : ObservableObject
     private readonly INavigationService _navigation;
     private readonly IDialogService _dialog;
 
-    [ObservableProperty]
-    private ObservableCollection<ProjectDto> _projects = [];
-
-    [ObservableProperty]
-    private bool _isLoading;
+    [ObservableProperty] private ObservableCollection<ProjectDto> _projects = [];
+    [ObservableProperty] private bool _isLoading;
 
     public ProjectsViewModel(ProjectService projectService, INavigationService navigation, IDialogService dialog)
     {
@@ -35,10 +32,7 @@ public partial class ProjectsViewModel : ObservableObject
             var list = await _projectService.GetAllProjectsAsync();
             Projects = new ObservableCollection<ProjectDto>(list);
         }
-        finally
-        {
-            IsLoading = false;
-        }
+        finally { IsLoading = false; }
     }
 
     [RelayCommand]
@@ -52,8 +46,6 @@ public partial class ProjectsViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task OpenProjectAsync(ProjectDto project)
-    {
-        await _navigation.GoToAsync($"AnalysisPage?projectId={project.Id}");
-    }
+    private Task OpenProjectAsync(ProjectDto project) =>
+        _navigation.GoToAsync($"AnalysisPage?projectId={project.Id}");
 }

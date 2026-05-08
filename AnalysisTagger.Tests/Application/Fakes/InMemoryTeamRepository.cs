@@ -30,4 +30,6 @@ public class InMemoryTeamRepository : ITeamRepository
         _store.Remove(id);
         return Task.CompletedTask;
     }
+
+    public void TrackNewPlayer(Player player) { }
 }

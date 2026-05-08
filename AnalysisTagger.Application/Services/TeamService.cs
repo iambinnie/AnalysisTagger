@@ -61,7 +61,7 @@ public class TeamService
             PhotoPath = dto.PhotoPath
         };
         team.Players.Add(player);
-        await _unitOfWork.Teams.UpdateAsync(team, cancellationToken);
+        _unitOfWork.Teams.TrackNewPlayer(player);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return MapPlayerToDto(player);
     }
