@@ -43,9 +43,12 @@
                 </Grid>
             </Border>
 
-            <!-- Templates (placeholder) -->
-            <Border Stroke="LightGray" StrokeThickness="1" StrokeShape="RoundRectangle 8" Opacity="0.5">
+            <!-- Templates -->
+            <Border Stroke="#9B59B6" StrokeThickness="1" StrokeShape="RoundRectangle 8">
                 <Grid ColumnDefinitions="Auto,*" Padding="16" ColumnSpacing="16">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToTemplatesCommand}" />
+                    </Grid.GestureRecognizers>
                     <Label Grid.Column="0" Text="🏷️" FontSize="36" VerticalOptions="Center" />
                     <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
                         <Label Text="Tag Templates" FontSize="18" FontAttributes="Bold" />

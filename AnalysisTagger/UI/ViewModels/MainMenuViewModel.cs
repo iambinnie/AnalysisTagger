@@ -15,4 +15,7 @@ public partial class MainMenuViewModel : ObservableObject
 
     [RelayCommand]
     private Task GoToTeamsAsync() => _navigation.GoToAsync(nameof(Pages.TeamsPage));
+
+    [RelayCommand]
+    private Task GoToTemplatesAsync() => _navigation.GoToAsync(nameof(Pages.TemplatesPage));
 }

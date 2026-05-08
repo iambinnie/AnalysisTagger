@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AnalysisTagger.UI.Pages.TemplatesPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:dto="clr-namespace:AnalysisTagger.Application.DTOs;assembly=AnalysisTagger.Application"
+    x:Name="ThisPage"
+    Title="Tag Templates">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End" Padding="12,8" Spacing="8">
+            <Button Text="+ New Template" Command="{Binding CreateTemplateCommand}" />
+        </HorizontalStackLayout>
+
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Templates}">
+            <CollectionView.EmptyView>
+                <Label
+                    Text="No templates yet — tap '+ New Template' to create one"
+                    TextColor="Gray"
+                    FontSize="13"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    HorizontalTextAlignment="Center"
+                    Margin="16" />
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="dto:TemplateDto">
+                    <Grid ColumnDefinitions="*,Auto,Auto" Padding="16,10" ColumnSpacing="8">
+
+                        <VerticalStackLayout Grid.Column="0" VerticalOptions="Center" Spacing="2">
+                            <VerticalStackLayout.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.OpenTemplateCommand}"
+                                    CommandParameter="{Binding .}" />
+                            </VerticalStackLayout.GestureRecognizers>
+                            <HorizontalStackLayout Spacing="8">
+                                <Label Text="{Binding Name}" FontSize="15" FontAttributes="Bold" />
+                                <Border
+                                    Stroke="Gray"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 4"
+                                    Padding="4,1"
+                                    IsVisible="{Binding IsBuiltIn}">
+                                    <Label Text="built-in" FontSize="10" TextColor="Gray" />
+                                </Border>
+                            </HorizontalStackLayout>
+                            <Label FontSize="12" TextColor="Gray">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="{Binding Sport}" />
+                                        <Span Text=" · " />
+                                        <Span Text="{Binding CategoryCount}" />
+                                        <Span Text=" categor(ies)" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </VerticalStackLayout>
+
+                        <Button
+                            Grid.Column="1"
+                            Text="✏️"
+                            FontSize="13"
+                            WidthRequest="40"
+                            HeightRequest="40"
+                            Padding="0"
+                            BackgroundColor="Transparent"
+                            Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.OpenTemplateCommand}"
+                            CommandParameter="{Binding .}" />
+
+                        <Button
+                            Grid.Column="2"
+                            Text="🗑"
+                            FontSize="13"
+                            WidthRequest="40"
+                            HeightRequest="40"
+                            Padding="0"
+                            BackgroundColor="Transparent"
+                            Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.DeleteTemplateCommand}"
+                            CommandParameter="{Binding .}" />
+
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+    </Grid>
+
+</ContentPage>

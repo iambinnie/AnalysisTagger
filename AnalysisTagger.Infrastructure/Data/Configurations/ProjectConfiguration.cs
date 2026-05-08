@@ -27,6 +27,7 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
         builder.HasOne(p => p.Template)
             .WithOne()
             .HasForeignKey<TagTemplate>("ProjectId")
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(p => p.Events)

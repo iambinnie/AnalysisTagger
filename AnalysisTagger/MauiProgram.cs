@@ -43,6 +43,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<TaggingService>();
         builder.Services.AddSingleton<PlaylistService>();
         builder.Services.AddSingleton<TeamService>();
+        builder.Services.AddSingleton<TemplateService>();
 
         builder.Services.AddTransient<MainMenuViewModel>();
         builder.Services.AddTransient<ProjectsViewModel>();
@@ -51,6 +52,9 @@ public static class MauiProgram
         builder.Services.AddTransient<AddEditTeamViewModel>();
         builder.Services.AddTransient<TeamRosterViewModel>();
         builder.Services.AddTransient<AddEditPlayerViewModel>();
+        builder.Services.AddTransient<TemplatesViewModel>();
+        builder.Services.AddTransient<TemplateEditorViewModel>();
+        builder.Services.AddTransient<AddEditCategoryViewModel>();
 
         builder.Services.AddTransient<MainMenuPage>();
         builder.Services.AddTransient<ProjectsPage>();
@@ -59,6 +63,9 @@ public static class MauiProgram
         builder.Services.AddTransient<AddEditTeamPage>();
         builder.Services.AddTransient<TeamRosterPage>();
         builder.Services.AddTransient<AddEditPlayerPage>();
+        builder.Services.AddTransient<TemplatesPage>();
+        builder.Services.AddTransient<TemplateEditorPage>();
+        builder.Services.AddTransient<AddEditCategoryPage>();
         builder.Services.AddSingleton<AppShell>();
 
 #if DEBUG
