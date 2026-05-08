@@ -30,7 +30,7 @@ public partial class AnalysisViewModel : ObservableObject, IDisposable
     [ObservableProperty] private string _projectId = string.Empty;
     [ObservableProperty] private string _projectTitle = "Analysis";
     [ObservableProperty] private string _templateName = string.Empty;
-    [ObservableProperty] private ObservableCollection<CategoryDto> _categories = [];
+    [ObservableProperty] private ObservableCollection<CategoryButtonViewModel> _categoryButtons = [];
     [ObservableProperty] private ObservableCollection<EventTagDto> _events = [];
 
     public bool IsSeeking { get; set; }
@@ -71,7 +71,7 @@ public partial class AnalysisViewModel : ObservableObject, IDisposable
         _currentTemplateId = project.TemplateId;
 
         var (categories, tags) = await _taggingService.GetProjectSummaryAsync(_currentProjectId);
-        Categories = new ObservableCollection<CategoryDto>(categories);
+        CategoryButtons = new ObservableCollection<CategoryButtonViewModel>(categories.Select(BuildCategoryButton));
         Events = new ObservableCollection<EventTagDto>(tags);
     }
 
@@ -162,13 +162,29 @@ public partial class AnalysisViewModel : ObservableObject, IDisposable
     public void SeekToSeconds(double seconds) =>
         _videoPlayer.Seek(Timecode.FromSeconds(seconds));
 
-    [RelayCommand]
-    private async Task TagEventAsync(CategoryDto category)
+    private CategoryButtonViewModel BuildCategoryButton(CategoryDto c)
+    {
+        var categoryId = c.Id;
+        var tagMain = new AsyncRelayCommand(() => TagCategoryAsync(categoryId, string.Empty));
+
+        var subItems = c.SubCategories
+            .Select(sc => new SubCategoryItem(sc, new AsyncRelayCommand(() => TagCategoryAsync(categoryId, sc))))
+            .ToList();
+
+        var rows = new List<SubCategoryRow>();
+        for (int i = 0; i < subItems.Count; i += 2)
+            rows.Add(new SubCategoryRow(subItems[i], i + 1 < subItems.Count ? subItems[i + 1] : null));
+
+        return new CategoryButtonViewModel(c.Name, c.Color, tagMain, rows);
+    }
+
+    private async Task TagCategoryAsync(Guid categoryId, string subCategory)
     {
         await _taggingService.TagEventAsync(_currentProjectId, new CreateEventTagDto
         {
-            CategoryId = category.Id,
-            Position = _videoPlayer.Position
+            CategoryId = categoryId,
+            Position = _videoPlayer.Position,
+            SubCategory = subCategory
         });
         await RefreshEventsAsync();
     }

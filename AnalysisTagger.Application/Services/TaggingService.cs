@@ -54,7 +54,7 @@ public class TaggingService
 
         var categories = project.Template.Categories
             .OrderBy(c => c.SortOrder)
-            .Select(c => new CategoryDto { Id = c.Id, Name = c.Name, Color = c.Color, SortOrder = c.SortOrder });
+            .Select(c => new CategoryDto { Id = c.Id, Name = c.Name, Color = c.Color, SortOrder = c.SortOrder, SubCategories = c.SubCategories });
 
         var tags = project.Events
             .OrderBy(e => e.StartTime.Value)

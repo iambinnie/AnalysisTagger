@@ -7,6 +7,7 @@
     xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     xmlns:dto="clr-namespace:AnalysisTagger.Application.DTOs;assembly=AnalysisTagger.Application"
     xmlns:converters="clr-namespace:AnalysisTagger.UI.Converters"
+    xmlns:vm="clr-namespace:AnalysisTagger.UI.ViewModels"
     Title="{Binding ProjectTitle}">
 
     <ContentPage.ToolbarItems>
@@ -86,20 +87,67 @@
                     <VerticalStackLayout
                         Padding="8"
                         Spacing="6"
-                        BindableLayout.ItemsSource="{Binding Categories}">
+                        BindableLayout.ItemsSource="{Binding CategoryButtons}">
                         <BindableLayout.EmptyView>
                             <Label Text="No categories" TextColor="Gray" FontSize="12" HorizontalOptions="Center" />
                         </BindableLayout.EmptyView>
                         <BindableLayout.ItemTemplate>
-                            <DataTemplate x:DataType="dto:CategoryDto">
-                                <Button
-                                    Text="{Binding Name}"
+                            <DataTemplate x:DataType="vm:CategoryButtonViewModel">
+                                <Border
                                     BackgroundColor="{Binding Color, Converter={StaticResource HexColor}}"
-                                    TextColor="White"
-                                    FontSize="13"
-                                    Padding="8,10"
-                                    Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.TagEventCommand}"
-                                    CommandParameter="{Binding .}" />
+                                    StrokeThickness="0"
+                                    StrokeShape="RoundRectangle 6"
+                                    Margin="0,0,0,2">
+                                    <VerticalStackLayout Spacing="0">
+
+                                        <!-- Main category label — tap tags with no subcategory -->
+                                        <Label
+                                            Text="{Binding Name}"
+                                            TextColor="White"
+                                            FontAttributes="Bold"
+                                            FontSize="13"
+                                            HorizontalTextAlignment="Center"
+                                            Padding="8,10">
+                                            <Label.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding TagCommand}" />
+                                            </Label.GestureRecognizers>
+                                        </Label>
+
+                                        <!-- Subcategory buttons — 2 per row -->
+                                        <VerticalStackLayout
+                                            IsVisible="{Binding HasSubCategories}"
+                                            Spacing="2"
+                                            Padding="4,0,4,4"
+                                            BindableLayout.ItemsSource="{Binding SubCategoryRows}">
+                                            <BindableLayout.ItemTemplate>
+                                                <DataTemplate x:DataType="vm:SubCategoryRow">
+                                                    <Grid ColumnDefinitions="*,*" ColumnSpacing="2">
+                                                        <Button
+                                                            Grid.Column="0"
+                                                            Text="{Binding Left.Name}"
+                                                            Command="{Binding Left.TagCommand}"
+                                                            TextColor="White"
+                                                            BackgroundColor="#44000000"
+                                                            FontSize="11"
+                                                            Padding="4,6"
+                                                            CornerRadius="4" />
+                                                        <Button
+                                                            Grid.Column="1"
+                                                            Text="{Binding Right.Name}"
+                                                            Command="{Binding Right.TagCommand}"
+                                                            IsVisible="{Binding HasRight}"
+                                                            TextColor="White"
+                                                            BackgroundColor="#44000000"
+                                                            FontSize="11"
+                                                            Padding="4,6"
+                                                            CornerRadius="4" />
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </BindableLayout.ItemTemplate>
+                                        </VerticalStackLayout>
+
+                                    </VerticalStackLayout>
+                                </Border>
                             </DataTemplate>
                         </BindableLayout.ItemTemplate>
                     </VerticalStackLayout>
@@ -138,6 +186,12 @@
                                             CommandParameter="{Binding .}" />
                                     </VerticalStackLayout.GestureRecognizers>
                                     <Label Text="{Binding CategoryName}" FontAttributes="Bold" FontSize="13" />
+                                    <Label
+                                        Text="{Binding SubCategory}"
+                                        FontSize="12"
+                                        TextColor="Gray"
+                                        FontAttributes="Italic"
+                                        IsVisible="{Binding SubCategory, Converter={toolkit:IsNotNullOrEmptyConverter}}" />
                                     <Label FontSize="12" TextColor="Gray">
                                         <Label.FormattedText>
                                             <FormattedString>

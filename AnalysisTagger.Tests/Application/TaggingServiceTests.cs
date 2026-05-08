@@ -240,6 +240,51 @@ public class TaggingServiceTests
     }
 
     [Fact]
+    public async Task GetProjectSummaryAsync_MapsSubCategoriesToDto()
+    {
+        var uow = new InMemoryUnitOfWork();
+        var svc = new TaggingService(uow);
+
+        var project = new Project
+        {
+            Template = new TagTemplate
+            {
+                Categories = new List<Category>
+                {
+                    new() { Name = "Shot", SortOrder = 1, SubCategories = new List<string> { "On Target", "Off Target" } }
+                }
+            },
+            HomeTeam = new Team(),
+            AwayTeam = new Team()
+        };
+        await uow.Projects.AddAsync(project);
+
+        var (categories, _) = await svc.GetProjectSummaryAsync(project.Id);
+        var dto = categories.Single();
+
+        dto.SubCategories.Should().HaveCount(2);
+        dto.SubCategories.Should().Contain("On Target").And.Contain("Off Target");
+    }
+
+    [Fact]
+    public async Task TagEventAsync_RecordsSubCategory()
+    {
+        var (svc, uow, project) = Create();
+        var categoryId = project.Template.Categories[0].Id;
+
+        var result = await svc.TagEventAsync(project.Id, new CreateEventTagDto
+        {
+            CategoryId = categoryId,
+            Position = Timecode.FromSeconds(30),
+            SubCategory = "On Target"
+        });
+
+        result.SubCategory.Should().Be("On Target");
+        var stored = await uow.Projects.GetByIdAsync(project.Id);
+        stored!.Events[0].SubCategory.Should().Be("On Target");
+    }
+
+    [Fact]
     public async Task GetProjectSummaryAsync_Throws_WhenProjectNotFound()
     {
         var uow = new InMemoryUnitOfWork();
