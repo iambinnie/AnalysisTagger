@@ -2,11 +2,11 @@ using AnalysisTagger.UI.ViewModels;
 
 namespace AnalysisTagger.UI.Pages;
 
-public partial class ProjectsPage : ContentPage
+public partial class ProjectSetupPage : ContentPage
 {
-    private readonly ProjectsViewModel _viewModel;
+    private readonly ProjectSetupViewModel _viewModel;
 
-    public ProjectsPage(ProjectsViewModel viewModel)
+    public ProjectSetupPage(ProjectSetupViewModel viewModel)
     {
         InitializeComponent();
         BindingContext = _viewModel = viewModel;
@@ -15,6 +15,6 @@ public partial class ProjectsPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        await _viewModel.LoadProjectsCommand.ExecuteAsync(null);
+        await _viewModel.LoadCommand.ExecuteAsync(null);
     }
 }

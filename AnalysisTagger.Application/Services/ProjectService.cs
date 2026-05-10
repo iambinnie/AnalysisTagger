@@ -15,7 +15,7 @@ public class ProjectService
     {
         var project = new Project
         {
-            Title = dto.Title,
+            Title = dto.Title.Trim(),
             Competition = dto.Competition,
             Season = dto.Season,
             MatchDate = dto.MatchDate,
@@ -25,8 +25,23 @@ public class ProjectService
             Template = TagTemplate.CreateDefault(dto.Sport)
         };
 
+        if (dto.HomeTeamId.HasValue)
+        {
+            var home = await _unitOfWork.Teams.GetByIdAsync(dto.HomeTeamId.Value, cancellationToken);
+            if (home is not null) project.HomeTeam = home;
+        }
+
+        if (dto.AwayTeamId.HasValue)
+        {
+            var away = await _unitOfWork.Teams.GetByIdAsync(dto.AwayTeamId.Value, cancellationToken);
+            if (away is not null) project.AwayTeam = away;
+        }
+
         await _unitOfWork.Projects.AddAsync(project, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        if (dto.TemplateId.HasValue)
+            await AssignTemplateAsync(project.Id, dto.TemplateId.Value, cancellationToken);
 
         return MapToDto(project);
     }
@@ -54,6 +69,8 @@ public class ProjectService
         project.Season = dto.Season;
         project.MatchDate = dto.MatchDate;
         project.VideoFilePath = dto.VideoFilePath;
+        project.Sport = dto.Sport;
+        project.TaggingMode = dto.TaggingMode;
 
         await _unitOfWork.Projects.UpdateAsync(project, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);

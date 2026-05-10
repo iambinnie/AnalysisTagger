@@ -16,15 +16,18 @@ public partial class AnalysisPage : ContentPage
         _videoPlayer = videoPlayer;
     }
 
-    protected override void OnAppearing()
+    protected override async void OnAppearing()
     {
         base.OnAppearing();
         _videoPlayer.Attach(VideoElement);
 
-        if (_initialNavigationComplete)
-            _ = _viewModel.LoadProjectAsync();
-        else
+        await _viewModel.LoadProjectAsync();
+
+        if (!_initialNavigationComplete)
+        {
             _initialNavigationComplete = true;
+            _viewModel.AutoLoadVideo();
+        }
     }
 
     protected override void OnDisappearing()

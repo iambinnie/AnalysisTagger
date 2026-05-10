@@ -54,13 +54,12 @@ public partial class AnalysisViewModel : ObservableObject, IDisposable
         _videoPlayer.PlaybackEnded += OnPlaybackEnded;
     }
 
+    private string _videoFilePath = string.Empty;
+
     partial void OnProjectIdChanged(string value)
     {
         if (Guid.TryParse(value, out var id))
-        {
             _currentProjectId = id;
-            _ = LoadProjectAsync();
-        }
     }
 
     internal async Task LoadProjectAsync()
@@ -69,10 +68,17 @@ public partial class AnalysisViewModel : ObservableObject, IDisposable
         ProjectTitle = project.Title;
         TemplateName = project.TemplateName;
         _currentTemplateId = project.TemplateId;
+        _videoFilePath = project.VideoFilePath;
 
         var (categories, tags) = await _taggingService.GetProjectSummaryAsync(_currentProjectId);
         CategoryButtons = new ObservableCollection<CategoryButtonViewModel>(categories.Select(BuildCategoryButton));
         Events = new ObservableCollection<EventTagDto>(tags);
+    }
+
+    internal void AutoLoadVideo()
+    {
+        if (!string.IsNullOrEmpty(_videoFilePath) && File.Exists(_videoFilePath))
+            _videoPlayer.Load(_videoFilePath);
     }
 
     private async Task RefreshEventsAsync()
@@ -124,7 +130,12 @@ public partial class AnalysisViewModel : ObservableObject, IDisposable
             })
         });
         if (result == null) return;
+
         _videoPlayer.Load(result.FullPath);
+
+        var project = await _projectService.GetProjectAsync(_currentProjectId);
+        project.VideoFilePath = result.FullPath;
+        await _projectService.UpdateProjectAsync(project);
     }
 
     [RelayCommand]

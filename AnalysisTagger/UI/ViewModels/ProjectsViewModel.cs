@@ -36,16 +36,26 @@ public partial class ProjectsViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task CreateProjectAsync()
-    {
-        var name = await _dialog.PromptAsync("New Project", "Enter project name:");
-        if (string.IsNullOrWhiteSpace(name)) return;
-
-        await _projectService.CreateProjectAsync(new CreateProjectDto { Title = name.Trim() });
-        await LoadProjectsAsync();
-    }
+    private Task CreateProjectAsync() =>
+        _navigation.GoToAsync(nameof(Pages.ProjectSetupPage));
 
     [RelayCommand]
     private Task OpenProjectAsync(ProjectDto project) =>
-        _navigation.GoToAsync($"AnalysisPage?projectId={project.Id}");
+        _navigation.GoToAsync($"{nameof(Pages.AnalysisPage)}?projectId={project.Id}");
+
+    [RelayCommand]
+    private Task EditProjectAsync(ProjectDto project) =>
+        _navigation.GoToAsync($"{nameof(Pages.ProjectSetupPage)}?projectId={project.Id}");
+
+    [RelayCommand]
+    private async Task DeleteProjectAsync(ProjectDto project)
+    {
+        var confirmed = await _dialog.ConfirmAsync(
+            "Delete Project",
+            $"Delete '{project.Title}'? All tags will be lost. This cannot be undone.");
+        if (!confirmed) return;
+
+        await _projectService.DeleteProjectAsync(project.Id);
+        await LoadProjectsAsync();
+    }
 }

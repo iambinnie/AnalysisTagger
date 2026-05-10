@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage
     x:Class="AnalysisTagger.UI.Pages.ProjectsPage"
+    x:Name="ThisPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:dto="clr-namespace:AnalysisTagger.Application.DTOs;assembly=AnalysisTagger.Application"
@@ -23,10 +24,8 @@
 
         <CollectionView
             Grid.Row="1"
-            x:Name="ProjectsCollection"
             ItemsSource="{Binding Projects}"
-            SelectionMode="Single"
-            SelectionChanged="OnProjectSelectionChanged">
+            SelectionMode="None">
 
             <CollectionView.EmptyView>
                 <VerticalStackLayout
@@ -49,18 +48,55 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="dto:ProjectDto">
                     <Border Margin="12,6" Padding="16" StrokeShape="RoundRectangle 8">
-                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                        <Grid ColumnDefinitions="*,Auto,Auto,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="8">
+
+                            <!-- Title -->
                             <Label
                                 Grid.Row="0" Grid.Column="0"
                                 Text="{Binding Title}"
                                 FontSize="16"
-                                FontAttributes="Bold" />
+                                FontAttributes="Bold"
+                                VerticalOptions="Center" />
+
+                            <!-- Tag count -->
                             <Label
                                 Grid.Row="0" Grid.Column="1"
                                 Text="{Binding EventCount, StringFormat='{0} tags'}"
                                 FontSize="13"
                                 TextColor="Gray"
                                 VerticalOptions="Center" />
+
+                            <!-- Edit -->
+                            <Button
+                                Grid.Row="0" Grid.Column="2"
+                                Grid.RowSpan="2"
+                                Text="✎"
+                                FontSize="14"
+                                WidthRequest="36"
+                                HeightRequest="36"
+                                Padding="0"
+                                BackgroundColor="Transparent"
+                                TextColor="Gray"
+                                Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.EditProjectCommand}"
+                                CommandParameter="{Binding .}"
+                                VerticalOptions="Center" />
+
+                            <!-- Delete -->
+                            <Button
+                                Grid.Row="0" Grid.Column="3"
+                                Grid.RowSpan="2"
+                                Text="✕"
+                                FontSize="14"
+                                WidthRequest="36"
+                                HeightRequest="36"
+                                Padding="0"
+                                BackgroundColor="Transparent"
+                                TextColor="Gray"
+                                Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.DeleteProjectCommand}"
+                                CommandParameter="{Binding .}"
+                                VerticalOptions="Center" />
+
+                            <!-- Competition · Season -->
                             <Label
                                 Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
                                 FontSize="13"
@@ -73,6 +109,14 @@
                                     </FormattedString>
                                 </Label.FormattedText>
                             </Label>
+
+                            <!-- Tap to open -->
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.OpenProjectCommand}"
+                                    CommandParameter="{Binding .}" />
+                            </Grid.GestureRecognizers>
+
                         </Grid>
                     </Border>
                 </DataTemplate>

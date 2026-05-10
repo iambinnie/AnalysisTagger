@@ -13,6 +13,7 @@ public partial class AppShell : Shell
         Routing.RegisterRoute(nameof(AddEditTeamPage),  typeof(AddEditTeamPage));
         Routing.RegisterRoute(nameof(TeamRosterPage),      typeof(TeamRosterPage));
         Routing.RegisterRoute(nameof(AddEditPlayerPage),   typeof(AddEditPlayerPage));
+        Routing.RegisterRoute(nameof(ProjectSetupPage),    typeof(ProjectSetupPage));
         Routing.RegisterRoute(nameof(TemplatesPage),       typeof(TemplatesPage));
         Routing.RegisterRoute(nameof(TemplateEditorPage),  typeof(TemplateEditorPage));
         Routing.RegisterRoute(nameof(AddEditCategoryPage), typeof(AddEditCategoryPage));

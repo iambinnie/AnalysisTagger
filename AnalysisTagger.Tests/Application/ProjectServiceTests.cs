@@ -212,4 +212,28 @@ public class ProjectServiceTests
         stored.Competition.Should().Be("Cup");
         stored.VideoFilePath.Should().Be("new.mp4");
     }
+
+    [Fact]
+    public async Task UpdateProjectAsync_UpdatesSportAndTaggingMode()
+    {
+        var (svc, uow) = Create();
+        var created = await svc.CreateProjectAsync(new CreateProjectDto
+        {
+            Title = "Test",
+            Sport = SportType.Football,
+            TaggingMode = TaggingMode.PostTagging
+        });
+
+        await svc.UpdateProjectAsync(new ProjectDto
+        {
+            Id = created.Id,
+            Title = "Test",
+            Sport = SportType.Basketball,
+            TaggingMode = TaggingMode.LiveTagging
+        });
+
+        var stored = await uow.Projects.GetByIdAsync(created.Id);
+        stored!.Sport.Should().Be(SportType.Basketball);
+        stored.TaggingMode.Should().Be(TaggingMode.LiveTagging);
+    }
 }

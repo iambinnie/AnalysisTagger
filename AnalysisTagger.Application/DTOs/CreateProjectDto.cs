@@ -11,4 +11,7 @@ public class CreateProjectDto
     public SportType Sport { get; set; } = SportType.Generic;
     public TaggingMode TaggingMode { get; set; } = TaggingMode.PostTagging;
     public string VideoFilePath { get; set; } = string.Empty;
+    public Guid? HomeTeamId { get; set; }
+    public Guid? AwayTeamId { get; set; }
+    public Guid? TemplateId { get; set; }
 }
