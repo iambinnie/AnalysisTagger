@@ -20,7 +20,7 @@
         <converters:HexColorConverter x:Key="HexColor" />
     </ContentPage.Resources>
 
-    <Grid RowDefinitions="*,Auto,Auto,*" RowSpacing="4">
+    <Grid RowDefinitions="*,Auto,48,Auto,*" RowSpacing="4">
 
         <!-- Row 0: Video player -->
         <toolkit:MediaElement
@@ -59,8 +59,15 @@
                 HorizontalOptions="Start" />
         </Grid>
 
-        <!-- Row 2: Playback controls -->
-        <VerticalStackLayout Grid.Row="2" Spacing="6" Margin="12,0,12,4">
+        <!-- Row 2: Timeline -->
+        <GraphicsView
+            x:Name="TimelineView"
+            Grid.Row="2"
+            Margin="12,0"
+            StartInteraction="OnTimelineStartInteraction" />
+
+        <!-- Row 3: Playback controls -->
+        <VerticalStackLayout Grid.Row="3" Spacing="6" Margin="12,0,12,4">
             <HorizontalStackLayout HorizontalOptions="Center" Spacing="10">
                 <Button Text="📂  Load"        Command="{Binding LoadVideoCommand}"      WidthRequest="100" />
                 <Button Text="⏮ Frame"        Command="{Binding StepBackwardCommand}"   IsEnabled="{Binding HasMedia}" WidthRequest="90" />
@@ -78,8 +85,8 @@
             </HorizontalStackLayout>
         </VerticalStackLayout>
 
-        <!-- Row 3: Tagging panel (left) + Event list (right) -->
-        <Grid Grid.Row="3" ColumnDefinitions="180,*" ColumnSpacing="0">
+        <!-- Row 4: Tagging panel (left) + Event list (right) -->
+        <Grid Grid.Row="4" ColumnDefinitions="180,*" ColumnSpacing="0">
 
             <!-- Category buttons -->
             <Border Grid.Column="0" Stroke="LightGray" StrokeThickness="1" Margin="8,4,4,8">
