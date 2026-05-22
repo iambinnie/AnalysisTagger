@@ -59,19 +59,28 @@ public partial class AnalysisPage : ContentPage
                 break;
 
             case nameof(AnalysisViewModel.Events):
-                _timelineDrawable.Segments = TimelineSegmentBuilder.Build(_viewModel.Events);
-                TimelineView.Invalidate();
+                RebuildTimeline();
                 break;
         }
+    }
+
+    private void RebuildTimeline()
+    {
+        var tracks = TimelineSegmentBuilder.Build(_viewModel.CurrentCategories, _viewModel.Events);
+        _timelineDrawable.Tracks = tracks;
+        TimelineView.HeightRequest = Math.Max(1, tracks.Count) * TimelineDrawable.RowHeight;
+        TimelineView.Invalidate();
     }
 
     private void OnTimelineStartInteraction(object? sender, TouchEventArgs e)
     {
         if (_viewModel.DurationSeconds <= 0) return;
         var touch = e.Touches.FirstOrDefault();
-        var width = TimelineView.Width;
-        if (width <= 0) return;
-        var seconds = touch.X / width * _viewModel.DurationSeconds;
+        var trackWidth = TimelineView.Width - TimelineDrawable.LabelWidth;
+        if (trackWidth <= 0) return;
+        var adjustedX = touch.X - TimelineDrawable.LabelWidth;
+        if (adjustedX < 0) return;
+        var seconds = adjustedX / trackWidth * _viewModel.DurationSeconds;
         _viewModel.SeekToSeconds(Math.Clamp(seconds, 0, _viewModel.DurationSeconds));
     }
 

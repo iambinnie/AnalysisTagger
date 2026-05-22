@@ -33,6 +33,8 @@ public partial class AnalysisViewModel : ObservableObject, IDisposable
     [ObservableProperty] private ObservableCollection<CategoryButtonViewModel> _categoryButtons = [];
     [ObservableProperty] private ObservableCollection<EventTagDto> _events = [];
 
+    public IReadOnlyList<CategoryDto> CurrentCategories { get; private set; } = [];
+
     public bool IsSeeking { get; set; }
 
     public AnalysisViewModel(
@@ -71,7 +73,9 @@ public partial class AnalysisViewModel : ObservableObject, IDisposable
         _videoFilePath = project.VideoFilePath;
 
         var (categories, tags) = await _taggingService.GetProjectSummaryAsync(_currentProjectId);
-        CategoryButtons = new ObservableCollection<CategoryButtonViewModel>(categories.Select(BuildCategoryButton));
+        var categoryList = categories.ToList();
+        CurrentCategories = categoryList;
+        CategoryButtons = new ObservableCollection<CategoryButtonViewModel>(categoryList.Select(BuildCategoryButton));
         Events = new ObservableCollection<EventTagDto>(tags);
     }
 

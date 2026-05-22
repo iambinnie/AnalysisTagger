@@ -20,7 +20,7 @@
         <converters:HexColorConverter x:Key="HexColor" />
     </ContentPage.Resources>
 
-    <Grid RowDefinitions="*,Auto,48,Auto,*" RowSpacing="4">
+    <Grid RowDefinitions="*,Auto,Auto,Auto,*" RowSpacing="4">
 
         <!-- Row 0: Video player -->
         <toolkit:MediaElement

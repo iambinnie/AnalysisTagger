@@ -5,34 +5,73 @@ namespace AnalysisTagger.UI.Graphics;
 
 public class TimelineDrawable : IDrawable
 {
-    public IReadOnlyList<TimelineSegmentData> Segments { get; set; } = [];
+    public const float RowHeight = 32f;
+    public const float LabelWidth = 90f;
+
+    private const float LabelPadding = 6f;
+    private const float SegmentHeight = 18f;
+    private const float SegmentMinWidth = 3f;
+
+    public IReadOnlyList<TimelineTrack> Tracks { get; set; } = [];
     public double PositionSeconds { get; set; }
     public double DurationSeconds { get; set; } = 1;
 
     public void Draw(ICanvas canvas, RectF dirtyRect)
     {
         float w = dirtyRect.Width;
-        float h = dirtyRect.Height;
+        float trackW = w - LabelWidth;
 
-        // Background track
-        canvas.FillColor = Color.FromArgb("#2A2A2A");
-        canvas.FillRoundedRectangle(0, h * 0.35f, w, h * 0.30f, 3);
-
-        if (DurationSeconds <= 0) return;
-
-        // Pin markers
-        foreach (var seg in Segments)
+        for (int i = 0; i < Tracks.Count; i++)
         {
-            float x = (float)(seg.StartSeconds / DurationSeconds * w);
-            canvas.FillColor = ParseColor(seg.ColorHex);
-            canvas.FillRectangle(x - 1.5f, 2, 3, h - 4);
+            var track = Tracks[i];
+            float rowY = i * RowHeight;
+
+            // Alternating row background
+            canvas.FillColor = i % 2 == 0
+                ? Color.FromArgb("#1E1E1E")
+                : Color.FromArgb("#252525");
+            canvas.FillRectangle(0, rowY, w, RowHeight);
+
+            // Category label
+            canvas.FontColor = Colors.LightGray;
+            canvas.FontSize = 10;
+            canvas.DrawString(
+                track.CategoryName,
+                LabelPadding, rowY,
+                LabelWidth - LabelPadding * 2, RowHeight,
+                HorizontalAlignment.Left, VerticalAlignment.Center);
+
+            // Track groove
+            canvas.FillColor = Color.FromArgb("#111111");
+            float grooveY = rowY + (RowHeight - SegmentHeight) / 2f;
+            canvas.FillRoundedRectangle(LabelWidth, grooveY, trackW, SegmentHeight, 2);
+
+            // Segments
+            if (DurationSeconds > 0 && track.Segments.Count > 0)
+            {
+                canvas.FillColor = ParseColor(track.ColorHex);
+                foreach (var seg in track.Segments)
+                {
+                    float segX = LabelWidth + (float)(seg.StartSeconds / DurationSeconds * trackW);
+                    float segW = Math.Max((float)((seg.EndSeconds - seg.StartSeconds) / DurationSeconds * trackW), SegmentMinWidth);
+                    canvas.FillRoundedRectangle(segX, grooveY, segW, SegmentHeight, 2);
+                }
+            }
         }
 
-        // Playhead
-        float playX = (float)(PositionSeconds / DurationSeconds * w);
-        canvas.StrokeColor = Colors.White;
-        canvas.StrokeSize = 2;
-        canvas.DrawLine(playX, 0, playX, h);
+        // Divider between label column and track area
+        canvas.StrokeColor = Color.FromArgb("#444444");
+        canvas.StrokeSize = 1;
+        canvas.DrawLine(LabelWidth, 0, LabelWidth, Tracks.Count * RowHeight);
+
+        // Playhead spanning all rows
+        if (DurationSeconds > 0 && Tracks.Count > 0)
+        {
+            float playX = LabelWidth + (float)(PositionSeconds / DurationSeconds * trackW);
+            canvas.StrokeColor = Colors.White;
+            canvas.StrokeSize = 2;
+            canvas.DrawLine(playX, 0, playX, Tracks.Count * RowHeight);
+        }
     }
 
     private static Color ParseColor(string hex)

@@ -7,68 +7,110 @@ namespace AnalysisTagger.Tests.UI;
 
 public class TimelineSegmentBuilderTests
 {
-    private static EventTagDto MakeEvent(double startSeconds, double endSeconds, string color = "#3498DB") => new()
+    private static CategoryDto MakeCategory(string name = "Shot", string color = "#3498DB") => new()
     {
+        Id = Guid.NewGuid(),
+        Name = name,
+        Color = color
+    };
+
+    private static EventTagDto MakeEvent(Guid categoryId, double startSeconds, double endSeconds) => new()
+    {
+        CategoryId = categoryId,
         StartTime = Timecode.FromSeconds(startSeconds),
         EndTime = Timecode.FromSeconds(endSeconds),
-        CategoryColor = color
+        CategoryColor = "#3498DB"
     };
 
     [Fact]
-    public void Build_EmptyEvents_ReturnsEmptyList()
+    public void Build_NoCategories_ReturnsEmptyList()
     {
-        var result = TimelineSegmentBuilder.Build([]);
+        var result = TimelineSegmentBuilder.Build([], []);
 
         result.Should().BeEmpty();
     }
 
     [Fact]
-    public void Build_MapsStartSecondsFromStartTime()
+    public void Build_CategoryWithNoEvents_ReturnsTrackWithNoSegments()
     {
-        var result = TimelineSegmentBuilder.Build([MakeEvent(10, 15)]);
+        var cat = MakeCategory("Pass");
 
-        result[0].StartSeconds.Should().BeApproximately(10, 0.001);
+        var result = TimelineSegmentBuilder.Build([cat], []);
+
+        result.Should().HaveCount(1);
+        result[0].Segments.Should().BeEmpty();
     }
 
     [Fact]
-    public void Build_MapsEndSecondsFromEndTime()
+    public void Build_RetainsOneLanePerCategory()
     {
-        var result = TimelineSegmentBuilder.Build([MakeEvent(10, 15)]);
+        var cats = new[] { MakeCategory("Shot"), MakeCategory("Pass"), MakeCategory("Tackle") };
 
-        result[0].EndSeconds.Should().BeApproximately(15, 0.001);
+        var result = TimelineSegmentBuilder.Build(cats, []);
+
+        result.Should().HaveCount(3);
     }
 
     [Fact]
-    public void Build_PreservesColorHex()
+    public void Build_TrackNameAndColorMatchCategory()
     {
-        var result = TimelineSegmentBuilder.Build([MakeEvent(0, 5, "#E74C3C")]);
+        var cat = MakeCategory("Corner", "#E74C3C");
 
+        var result = TimelineSegmentBuilder.Build([cat], []);
+
+        result[0].CategoryName.Should().Be("Corner");
         result[0].ColorHex.Should().Be("#E74C3C");
     }
 
     [Fact]
-    public void Build_MultipleEvents_RetainsOrder()
+    public void Build_EventMappedToCorrectTrack()
     {
-        var events = new[]
-        {
-            MakeEvent(30, 35, "#FF0000"),
-            MakeEvent(10, 15, "#00FF00"),
-            MakeEvent(20, 25, "#0000FF"),
-        };
+        var shot = MakeCategory("Shot");
+        var pass = MakeCategory("Pass");
+        var ev = MakeEvent(pass.Id, 10, 15);
 
-        var result = TimelineSegmentBuilder.Build(events);
+        var result = TimelineSegmentBuilder.Build([shot, pass], [ev]);
 
-        result.Should().HaveCount(3);
-        result[0].StartSeconds.Should().BeApproximately(30, 0.001);
-        result[1].StartSeconds.Should().BeApproximately(10, 0.001);
-        result[2].StartSeconds.Should().BeApproximately(20, 0.001);
+        result.First(t => t.CategoryId == shot.Id).Segments.Should().BeEmpty();
+        result.First(t => t.CategoryId == pass.Id).Segments.Should().HaveCount(1);
     }
 
     [Fact]
-    public void Build_ZeroLengthEvent_StartAndEndEqual()
+    public void Build_SegmentStartAndEndSecondsCorrect()
     {
-        var result = TimelineSegmentBuilder.Build([MakeEvent(45, 45)]);
+        var cat = MakeCategory();
+        var ev = MakeEvent(cat.Id, 12.5, 17.0);
 
-        result[0].StartSeconds.Should().Be(result[0].EndSeconds);
+        var result = TimelineSegmentBuilder.Build([cat], [ev]);
+
+        var seg = result[0].Segments[0];
+        seg.StartSeconds.Should().BeApproximately(12.5, 0.001);
+        seg.EndSeconds.Should().BeApproximately(17.0, 0.001);
+    }
+
+    [Fact]
+    public void Build_MultipleEventsInSameTrack()
+    {
+        var cat = MakeCategory();
+        var events = new[]
+        {
+            MakeEvent(cat.Id, 5, 8),
+            MakeEvent(cat.Id, 20, 25),
+            MakeEvent(cat.Id, 60, 65),
+        };
+
+        var result = TimelineSegmentBuilder.Build([cat], events);
+
+        result[0].Segments.Should().HaveCount(3);
+    }
+
+    [Fact]
+    public void Build_CategoryOrderPreserved()
+    {
+        var cats = new[] { MakeCategory("A"), MakeCategory("B"), MakeCategory("C") };
+
+        var result = TimelineSegmentBuilder.Build(cats, []);
+
+        result.Select(t => t.CategoryName).Should().Equal("A", "B", "C");
     }
 }
